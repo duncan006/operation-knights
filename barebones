@@ -1,0 +1,20 @@
+import sys
+import pygame
+
+pygame.init()
+
+width = 800
+heigh = 600
+
+screen = pygame.display.set_mode((width,height))
+
+game_over = False
+
+while not game_over:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+            
+    screen.fill(black)
+    screen.blit()
+    pygame.display.flip()
