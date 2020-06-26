@@ -4,8 +4,7 @@ import random
 
 pygame.init()
 
-spawnRate = 3000
-difficulty = 1
+spawnRate = 1000
 
 WIDTH = 800
 HEIGHT = 600
@@ -25,12 +24,16 @@ background_color = (0,0,0)
 gravity = 15
 game_over = False
 
+score = 0
+
 clock = pygame.time.Clock()
+
+myFont = pygame.font.SysFont("monospace", 35)
 
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 
 def drop_enemies(enemyList):
-    if (random.randint(0, spawnRate))/100 <= 1:
+    if random.random() <= .1:
         if len(enemyList) < 10:
             x_pos = random.randint(0,WIDTH-E_SIZE)
             y_pos = 0
@@ -40,12 +43,14 @@ def draw_enemies(enemyList):
     for enemyPos in enemyList:
         pygame.draw.rect(screen, E_COLOR, (enemyPos[0],enemyPos[1],E_SIZE,E_SIZE))
 
-def update_enemy_pos(enemyList):
+def update_enemy_pos(enemyList, score):
     for idx, enemyPos in enumerate(enemyList):
         if enemyPos[1] >= 0 and enemyPos[1] < HEIGHT:
             enemyPos[1] += E_SPEED
         else:
             enemyList.pop(idx)
+            score += 1
+    return score
 
 def enemy_collision_check(enemyList, playerPos):
     for enemyPos in enemyList:
@@ -84,16 +89,18 @@ while not game_over:
     screen.fill(background_color)
 
     drop_enemies(enemyList)
-    update_enemy_pos(enemyList)
+    score = update_enemy_pos(enemyList, score)
     
     if enemy_collision_check(enemyList, P_POS) == True:
         game_over = True
         break
     
     draw_enemies(enemyList)
-    pygame.draw.rect(screen, P_COLOR, (P_POS[0],P_POS[1],P_SIZE,P_SIZE))
     
-    spawnRate -= difficulty
+    text = "score: " + str(score)
+    label = myFont.render(text, 1, (255,0,0))
+    screen.blit(label, (WIDTH-200, HEIGHT-40))
+    pygame.draw.rect(screen, P_COLOR, (P_POS[0],P_POS[1],P_SIZE,P_SIZE))
     
     clock.tick(30)
     
