@@ -1,0 +1,59 @@
+import sys
+import pygame
+pygame.init()
+
+WINDOW_HEIGHT = 500
+WINDOW_WIDTH = 500
+
+screen = pygame.display.set_mode([WINDOW_WIDTH, WINDOW_HEIGHT])
+clock = pygame.time.Clock()
+
+class Player:
+    def __init__(self, x, y, color):
+        self.x = x
+        self.y = y
+        self.color = color
+        self.height = 50
+        self.width = 20
+        self.speed = 20
+        self.jumpCount = 0
+        self.jumping = False
+        self.jumpList = [1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1,-1,-1,-1,-1,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3,-4,-4,-4,-4,-4,-4,-4,-4,-4,-4,-4,-4]
+
+    def special_move_handler(self):
+        if self.jumping:
+            self.y -= self.jumpList[self.jumpCount]
+            self.jumpCount += 1
+            if self.jumpCount > 108:
+                self.jumpCount = 0
+                self.jumping = False
+
+player = Player(WINDOW_WIDTH/2,WINDOW_HEIGHT-50,(255,0,0))
+
+running = True
+while running:
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_a:
+                player.x -= player.speed
+            if event.key == pygame.K_d:
+                player.x += player.speed
+            if event.key == pygame.K_w:
+                player.jumping = True
+                
+
+    screen.fill((0,0,0))
+
+    # Draw a solid blue circle in the center
+    player.special_move_handler()
+    pygame.draw.rect(screen, (0, 0, 255), (int(player.x), int(player.y), int(player.width), int(player.height)))
+    
+    clock.tick(30)
+    
+    # Flip the display
+    pygame.display.flip()
+pygame.quit()
