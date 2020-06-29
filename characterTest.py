@@ -9,7 +9,7 @@ WINDOW_HEIGHT = 300
 WINDOW_WIDTH = 600
 
 screen = pygame.display.set_mode([WINDOW_WIDTH, WINDOW_HEIGHT])
-player = Player(WINDOW_WIDTH/2,WINDOW_HEIGHT-50,(255,0,0))
+player = characterClass.Player(WINDOW_WIDTH/2,WINDOW_HEIGHT-50,(255,0,0))
 clock = pygame.time.Clock()
 
 running = True
