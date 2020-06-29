@@ -1,7 +1,6 @@
 import sys
 import random
 import pygame
-score = 0
 pygame.init()
 
 fps = 30
@@ -9,6 +8,7 @@ WINDOW_HEIGHT = 300
 WINDOW_WIDTH = 600
 
 enemyList = []
+wasbool = False
 
 screen = pygame.display.set_mode([WINDOW_WIDTH, WINDOW_HEIGHT])
 clock = pygame.time.Clock()
@@ -30,9 +30,13 @@ class Player:
         self.x = x
         self.y = y
         self.color = color
-        self.height = 50
+        self.crouchHeight = 30
+        self.standHeight = 50
+        self.height = self.standHeight
         self.width = 20
         self.speed = 5
+        self.score = 0
+        
         self.jumpCount = 0
         self.jumping = False
         self.jumpMult = 3
@@ -44,7 +48,7 @@ class Player:
         
         
     def special_move_handler(self):
-        if self.jumping:
+        if self.jumping and not self.crouch:
             self.y -= self.jumpMult * self.jumpList[self.jumpCount]
             self.jumpCount += 1
             if self.jumpCount > len(self.jumpList)-1:
@@ -60,7 +64,7 @@ class Player:
 player = Player(WINDOW_WIDTH/2,WINDOW_HEIGHT-50,(255,0,0))
 
 def dropEnemies(enemyList):
-    if random.random() < 0.05:
+    if random.random() < 0.01:
         if len(enemyList) < 8:
             x_pos = WINDOW_WIDTH
             y_pos = random.randint(0, WINDOW_HEIGHT - 10)
@@ -70,13 +74,12 @@ def drawEnemies(enemyList):
     for enemy in enemyList:
         pygame.draw.rect(screen, enemy.color, [enemy.x, enemy.y, enemy.width, enemy.height])
 
-def updateEnemies(enemyList, score):
+def updateEnemies(enemyList, player):
     for idx, enemy in enumerate(enemyList):
         enemy.x -= enemy.speed
         if enemy.x < 0:
             enemyList.pop(idx)
-            score = score + 1
-            print(score)
+            player.score += 1
 
 def collisionHandler(player, enemyList):
     keepRunning = True
@@ -102,25 +105,22 @@ while running:
                 player.heldLeft = True
             if event.key == pygame.K_d:
                 player.heldRight = True
-            if event.key == pygame.K_s and player.jumping == False: 
-                    change = player.height * 0.4
-                    player.y = player.y + player.height - change
-                    player.height = change
-                    player.crouch = True
-                
-            if event.key == pygame.K_SPACE or event.key == pygame.K_w:
-                if player.crouch == False:
-                    player.jumping = True
+            if event.key == pygame.K_s and not player.jumping: 
+                player.height = player.crouchHeight
+                player.y = player.y + player.standHeight - player.crouchHeight
+                player.crouch = True
+            if (event.key == pygame.K_SPACE or event.key == pygame.K_w) and not player.crouch:
+                player.jumping = True
                 
         if event.type == pygame.KEYUP:
+            
             if event.key == pygame.K_a:
                 player.heldLeft = False
             if event.key == pygame.K_d:
                 player.heldRight = False
-            if event.key == pygame.K_s and player.jumping == False:
-                change = player.height / 0.4
-                player.y = player.y + player.height - change
-                player.height = change
+            if event.key == pygame.K_s and not player.jumping:
+                player.height = player.standHeight
+                player.y = player.y + player.crouchHeight - player.standHeight
                 player.crouch = False
                 
         for e in pygame.event.get():
@@ -133,12 +133,12 @@ while running:
     pygame.draw.rect(screen, (0, 0, 255), (int(player.x), int(player.y), int(player.width), int(player.height)))
     
     dropEnemies(enemyList)
-    updateEnemies(enemyList, score)
+    updateEnemies(enemyList, player)
     drawEnemies(enemyList)
     
     running = collisionHandler(player, enemyList)
     
-    text = "score: " + str(score)
+    text = "score: " + str(player.score)
     label = scoreFont.render(text, 1, (255,0,0))
     screen.blit(label, (WINDOW_WIDTH-200, WINDOW_HEIGHT-40))
     
