@@ -73,13 +73,16 @@ def updateEnemies(enemyList):
         if enemy.x < 0:
             enemyList.pop(idx)
 
-def collisionHandler(player, enemyList, running):
+def collisionHandler(player, enemyList):
+    keepRunning = True
     for enemy in enemyList:
         if (player.x < enemy.x + enemy.width and player.x + player.width > enemy.x and player.y < enemy.y + enemy.height and player.y + player.height > enemy.y):
-                running = False
+            keepRunning = False
+    
+    if keepRunning:
+        return True
+    if not keepRunning:
         return False
-        
-        
 
 running = True
 while running:
@@ -128,7 +131,7 @@ while running:
     updateEnemies(enemyList)
     drawEnemies(enemyList)
     
-    collisionHandler(player, enemyList, running)
+    running = collisionHandler(player, enemyList)
     
     clock.tick(fps)
     
