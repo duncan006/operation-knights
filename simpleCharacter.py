@@ -1,6 +1,7 @@
 import sys
 import random
 import pygame
+score = 0
 pygame.init()
 
 fps = 30
@@ -11,6 +12,8 @@ enemyList = []
 
 screen = pygame.display.set_mode([WINDOW_WIDTH, WINDOW_HEIGHT])
 clock = pygame.time.Clock()
+
+scoreFont = pygame.font.SysFont("monospace", 35)
 
 class Enemy:
     def __init__(self, x, y):
@@ -67,11 +70,13 @@ def drawEnemies(enemyList):
     for enemy in enemyList:
         pygame.draw.rect(screen, enemy.color, [enemy.x, enemy.y, enemy.width, enemy.height])
 
-def updateEnemies(enemyList):
+def updateEnemies(enemyList, score):
     for idx, enemy in enumerate(enemyList):
         enemy.x -= enemy.speed
         if enemy.x < 0:
             enemyList.pop(idx)
+            score = score + 1
+            print(score)
 
 def collisionHandler(player, enemyList):
     keepRunning = True
@@ -128,10 +133,14 @@ while running:
     pygame.draw.rect(screen, (0, 0, 255), (int(player.x), int(player.y), int(player.width), int(player.height)))
     
     dropEnemies(enemyList)
-    updateEnemies(enemyList)
+    updateEnemies(enemyList, score)
     drawEnemies(enemyList)
     
     running = collisionHandler(player, enemyList)
+    
+    text = "score: " + str(score)
+    label = scoreFont.render(text, 1, (255,0,0))
+    screen.blit(label, (WINDOW_WIDTH-200, WINDOW_HEIGHT-40))
     
     clock.tick(fps)
     
